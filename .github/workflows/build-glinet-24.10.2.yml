@@ -11,7 +11,7 @@ on:
           - glinet_gl-mt2500
           - glinet_gl-mt6000
           - glinet_gl-b2200
-        default: glinet_gl-mt3000
+        default: glinet_gl-mt6000
       include_docker:
         description: |
           是否编译 Docker 插件
@@ -56,20 +56,7 @@ jobs:
               echo "Error: PPPoE account and password must be provided when PPPoE is enabled!"
               exit 1
             fi
-          fi
-      
-      - name: Download Clash Meta, GeoIP, and GeoSite
-        run: |
-          PLATFORM="arm64" 
-          mkdir -p files/etc/openclash/core
-          # Download clash_meta
-          META_URL="https://raw.githubusercontent.com/vernesong/OpenClash/core/master/meta/clash-linux-${PLATFORM}.tar.gz"
-          wget -qO- $META_URL | tar xOvz > files/etc/openclash/core/clash_meta
-          chmod +x files/etc/openclash/core/clash_meta
-          # Download GeoIP and GeoSite
-          wget -q https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat -O files/etc/openclash/GeoIP.dat
-          wget -q https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat -O files/etc/openclash/GeoSite.dat
-      
+          fi    
 
       - name: Build Gl-iNet ImmortalWrt 24.10.2
         run: |
@@ -93,6 +80,8 @@ jobs:
               --user root \
               -v "${{ github.workspace }}/bin:/home/build/immortalwrt/bin" \
               -v "${{ github.workspace }}/glinet:/home/build/immortalwrt/files/etc/uci-defaults" \
+              -v "${{ github.workspace }}/arch/arch.conf:/home/build/immortalwrt/files/etc/opkg/arch.conf" \
+              -v "${{ github.workspace }}/shell:/home/build/immortalwrt/shell" \
               -v "${{ github.workspace }}/mediatek-filogic/build-24.sh:/home/build/immortalwrt/build.sh" \
               -e PROFILE=$profile \
               -e INCLUDE_DOCKER=$include_docker \
